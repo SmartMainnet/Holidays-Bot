@@ -1,7 +1,11 @@
-require('dotenv').config()
-const { STICKER, BOT_API, MONGODB_URI } = process.env
+import 'dotenv/config'
+import { MongoClient } from 'mongodb'
+import TelegramApi from 'node-telegram-bot-api'
+import axios from 'axios'
+import cheerio from 'cheerio'
 
-const { MongoClient } = require('mongodb')
+const { BOT_TOKEN, MONGODB_URI, STICKER } = process.env
+
 const client = new MongoClient(MONGODB_URI)
 
 client.connect()
@@ -9,13 +13,7 @@ client.connect()
 const db = client.db('holidays-bot')
 const users = db.collection('users')
 
-const axios = require("axios")
-const cheerio = require("cheerio")
-
-const TelegramApi = require('node-telegram-bot-api')
-
-const token = BOT_API
-const bot = new TelegramApi(token, { polling: true })
+const bot = new TelegramApi(BOT_TOKEN, { polling: true })
 
 const reply_markup = JSON.stringify({
   keyboard: [
@@ -63,7 +61,7 @@ bot.on('message', async msg => {
         $(selector).each((i, elem) => {
           let name = $(elem).text()
           let url = $(elem).attr('href')
-          let message = `${i+1}: <a href="${url}">${name}</a>\n`
+          let message = `${i+1}: <a href='${url}'>${name}</a>\n`
           text += message
         })
         bot.sendMessage(chatId, text, { parse_mode: 'HTML', disable_web_page_preview: true, reply_markup })
